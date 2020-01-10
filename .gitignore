@@ -1,0 +1,8 @@
+
+Cake.SharePoint/bin/Debug/netstandard2.0/
+
+Cake.SharePoint/bin/Release/netcoreapp2.1/
+
+*.user
+
+Cake.SharePoint/obj/
