@@ -1,0 +1,68 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>netstandard2.0</TargetFramework>
+    <UseNETCoreGenerator>true</UseNETCoreGenerator>
+    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Cake.Core" Version="0.35.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="Microsoft.Office.Client.Policy.Portable">
+      <HintPath>SharePointLibs\Microsoft.Office.Client.Policy.Portable.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Microsoft.Office.Client.TranslationServices.Portable">
+      <HintPath>SharePointLibs\Microsoft.Office.Client.TranslationServices.Portable.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Microsoft.ProjectServer.Client.Portable">
+      <HintPath>SharePointLibs\Microsoft.ProjectServer.Client.Portable.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.DocumentManagement.Portable">
+      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.DocumentManagement.Portable.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.Portable">
+      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.Portable.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Microsoft.Sharepoint.Client.Publishing.Portable">
+      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.Publishing.Portable.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.Runtime.Portable">
+      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.Runtime.Portable.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.Runtime.Windows">
+      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.Runtime.Windows.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.Search.Applications.Portable">
+      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.Search.Applications.Portable.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.Search.Portable">
+      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.Search.Portable.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.Taxonomy.Portable">
+      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.Taxonomy.Portable.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.UserProfiles.Portable">
+      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.UserProfiles.Portable.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+    <Reference Include="Microsoft.SharePoint.Client.WorkflowServices.Portable">
+      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.WorkflowServices.Portable.dll</HintPath>
+      <Private>true</Private>
+    </Reference>
+  </ItemGroup>
+
+</Project>

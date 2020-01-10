@@ -1,0 +1,22 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<package xmlns="http://schemas.microsoft.com/packaging/2011/08/nuspec.xsd">
+  <metadata>
+    <id>Cake.SharePoint</id>
+    <version>1.0.0</version>
+    <title>Cake.SharePoint</title>
+    <authors>Jeroen Vandezande</authors>
+    <owners>Jeroen Vandezande</owners>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <licenseUrl>https://github.com/orialmog/Cake.ProjHelpers/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/orialmog/Cake.ProjHelpers</projectUrl>
+    <iconUrl>https://cdn.rawgit.com/cake-contrib/graphics/a5cf0f881c390650144b2243ae551d5b9f836196/png/cake-contrib-medium.png</iconUrl>
+    <description>Cake AddIn to upload build artifacts to SharePoint.</description>
+    <summary>Cake AddIn to upload build artifacts to SharePoint.</summary>
+    <releaseNotes>initial release</releaseNotes>
+    <copyright>Copyright © Jeroen Vandezande 2020</copyright>
+    <tags>Cake Script Build SharePoint</tags>
+  </metadata>
+  <files>
+    
+  </files>
+</package>
