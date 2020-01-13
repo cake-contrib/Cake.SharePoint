@@ -3,7 +3,21 @@
   <PropertyGroup>
     <TargetFramework>netstandard2.0</TargetFramework>
     <UseNETCoreGenerator>true</UseNETCoreGenerator>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
+    <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
+    <Version>1.0.4</Version>
+    <Authors>Jeroen Vandezande</Authors>
+    <Company />
+    <Description>Cake AddIn to upload build artifacts to SharePoint.
+Also allows to get the current filenames on the server and also dele files on the server.</Description>
+    <Copyright>Copyright © Jeroen Vandezande 2020</Copyright>
+    <PackageProjectUrl>https://github.com/JeroenVandezande/Cake.SharePoint</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/JeroenVandezande/Cake.SharePoint.git</RepositoryUrl>
+    <PackageTags>Cake Script Build SharePoint</PackageTags>
+    <PackageReleaseNotes>Added methods to get the filenames on the remote server and also a way to delete files.</PackageReleaseNotes>
+    <PackageIcon>cake-contrib-medium.png</PackageIcon>
+    <PackageIconUrl />
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
   <ItemGroup>
@@ -63,6 +77,13 @@
       <HintPath>SharePointLibs\Microsoft.SharePoint.Client.WorkflowServices.Portable.dll</HintPath>
       <Private>true</Private>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Include="\\Mac\Home\Downloads\cake-contrib-medium.png">
+      <Pack>True</Pack>
+      <PackagePath></PackagePath>
+    </None>
   </ItemGroup>
 
 </Project>

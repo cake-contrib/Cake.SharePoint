@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
@@ -189,6 +190,61 @@ namespace Cake.SharePoint
                     }
                 }
             }
+        }
+
+        [CakeMethodAlias]
+        public static IList<String> SharePointGetFilenamesInFolder(this ICakeContext cakecontext, string destinationfoldername, SharePointSettings sharepointdetails)
+        {
+            //Bind to site collection
+            var clientcontext = new ClientContext(sharepointdetails.SharePointURL);
+            var creds = new SharePointOnlineCredentials(sharepointdetails.UserName, sharepointdetails.Password);
+            clientcontext.Credentials = creds;
+            // Get the folder to upload into. 
+            List docs = clientcontext.Web.Lists.GetByTitle(sharepointdetails.LibraryName);
+            clientcontext.Load(docs, l => l.RootFolder);
+            // Get the information about the folder that will hold the file.
+            clientcontext.Load(docs.RootFolder, f => f.ServerRelativeUrl);
+            clientcontext.Load(docs.RootFolder.Folders);
+            clientcontext.ExecuteQueryAsync().Wait();
+
+            var targetFolder = GetRemoteFolder(clientcontext, destinationfoldername, docs.RootFolder);
+            clientcontext.Load(targetFolder.Files);
+            var result = new List<String>();
+            clientcontext.ExecuteQueryAsync().Wait();
+            foreach (var filename in targetFolder.Files)
+            {
+                result.Add(filename.Name);
+            }
+            return result;
+        }
+
+        [CakeMethodAlias]
+        public static void SharePointDeleteFilesInFolder(this ICakeContext cakecontext, IList<String> filenames, String destinationfoldername, SharePointSettings sharepointdetails)
+        {
+            //Bind to site collection
+            var clientcontext = new ClientContext(sharepointdetails.SharePointURL);
+            var creds = new SharePointOnlineCredentials(sharepointdetails.UserName, sharepointdetails.Password);
+            clientcontext.Credentials = creds;
+            // Get the folder to upload into. 
+            List docs = clientcontext.Web.Lists.GetByTitle(sharepointdetails.LibraryName);
+            clientcontext.Load(docs, l => l.RootFolder);
+            // Get the information about the folder that will hold the file.
+            clientcontext.Load(docs.RootFolder, f => f.ServerRelativeUrl);
+            clientcontext.Load(docs.RootFolder.Folders);
+            clientcontext.ExecuteQueryAsync().Wait();
+
+            var targetFolder = GetRemoteFolder(clientcontext, destinationfoldername, docs.RootFolder);
+            clientcontext.Load(targetFolder.Files);
+            var result = new List<String>();
+            clientcontext.ExecuteQueryAsync().Wait();
+            foreach (var fn in targetFolder.Files)
+            {
+                if (filenames.Contains(fn.Name))
+                {
+                    fn.DeleteObject();
+                }
+            }
+            clientcontext.ExecuteQueryAsync().Wait();
         }
     }
 }
