@@ -235,14 +235,11 @@ namespace Cake.SharePoint
 
             var targetFolder = GetRemoteFolder(clientcontext, destinationfoldername, docs.RootFolder);
             clientcontext.Load(targetFolder.Files);
-            var result = new List<String>();
             clientcontext.ExecuteQueryAsync().Wait();
-            foreach (var fn in targetFolder.Files)
-            {
-                if (filenames.Contains(fn.Name))
-                {
-                    fn.DeleteObject();
-                }
+            var filesToDelete = targetFolder.Files.Where(f => filenames.Contains(f.Name)).ToList();
+            foreach (var fn in filesToDelete)
+            {         
+                fn.DeleteObject();
             }
             clientcontext.ExecuteQueryAsync().Wait();
         }

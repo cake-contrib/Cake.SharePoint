@@ -4,16 +4,16 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <UseNETCoreGenerator>true</UseNETCoreGenerator>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.4</Version>
+    <Version>1.0.5</Version>
     <Authors>Jeroen Vandezande</Authors>
     <Company />
     <Description>Cake AddIn to upload build artifacts to SharePoint.
-Also allows to get the current filenames on the server and also dele files on the server.</Description>
+Also allows to get the current filenames on the server and also delete files on the server.</Description>
     <Copyright>Copyright © Jeroen Vandezande 2020</Copyright>
     <PackageProjectUrl>https://github.com/JeroenVandezande/Cake.SharePoint</PackageProjectUrl>
     <RepositoryUrl>https://github.com/JeroenVandezande/Cake.SharePoint.git</RepositoryUrl>
     <PackageTags>Cake Script Build SharePoint</PackageTags>
-    <PackageReleaseNotes>Added methods to get the filenames on the remote server and also a way to delete files.</PackageReleaseNotes>
+    <PackageReleaseNotes>Fixed deleting of remote files.</PackageReleaseNotes>
     <PackageIcon>cake-contrib-medium.png</PackageIcon>
     <PackageIconUrl />
     <RepositoryType>git</RepositoryType>
@@ -21,7 +21,7 @@ Also allows to get the current filenames on the server and also dele files on th
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cake.Core" Version="0.35.0" />
+    <PackageReference Include="Cake.Core" Version="0.35.0" PrivateAssets="All" />
   </ItemGroup>
 
   <ItemGroup>

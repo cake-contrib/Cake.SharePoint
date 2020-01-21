@@ -6,3 +6,17 @@ Cake.SharePoint/bin/Release/netcoreapp2.1/
 *.user
 
 Cake.SharePoint/obj/
+
+.vs/Cake.SharePoint/DesignTimeBuild/
+
+.vs/Cake.SharePoint/v16/
+
+.vs/Cake.SharePoint/xs/project-cache/
+
+.vs/Cake.SharePoint/xs/sqlite3/
+
+.vs/Cake.SharePoint/xs/
+
+Cake.SharePoint.1.0.4.nupkg
+
+Cake.SharePoint/bin/Debug/Cake.SharePoint.1.0.5.nupkg
