@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.IO;
 using System.Linq;
+using System.Net;
 using System.Security;
 using Cake.Core;
 using Cake.Core.Annotations;
@@ -13,7 +14,7 @@ namespace Cake.SharePoint
 {
     public static class CakeSharepoint
     {
-        private static readonly int fileChunkSizeInMB = 10;
+        private static readonly int fileChunkSizeInMB = 8;
 
         private static Microsoft.SharePoint.Client.Folder GetRemoteFolder(ClientContext ctx, string aRemoteFolder, Microsoft.SharePoint.Client.Folder aRootFolder)
         {
@@ -46,7 +47,7 @@ namespace Cake.SharePoint
             cakecontext?.Log.Write(Verbosity.Normal, LogLevel.Debug, $"Uploading file '{uniqueFileName}' ({(fileSize / 1048576):F} MB) to SharePoint ({destinationfoldername})");
             //Bind to site collection
             var clientcontext = new ClientContext(sharepointdetails.SharePointURL);
-            var creds = new SharePointOnlineCredentials(sharepointdetails.UserName, sharepointdetails.Password);
+            var creds = new NetworkCredential(sharepointdetails.UserName, sharepointdetails.Password);
             clientcontext.Credentials = creds;
             //upload file
             var sw = new Stopwatch();
@@ -197,7 +198,7 @@ namespace Cake.SharePoint
         {
             //Bind to site collection
             var clientcontext = new ClientContext(sharepointdetails.SharePointURL);
-            var creds = new SharePointOnlineCredentials(sharepointdetails.UserName, sharepointdetails.Password);
+            var creds = new NetworkCredential(sharepointdetails.UserName, sharepointdetails.Password);
             clientcontext.Credentials = creds;
             // Get the folder to upload into. 
             List docs = clientcontext.Web.Lists.GetByTitle(sharepointdetails.LibraryName);
@@ -223,7 +224,7 @@ namespace Cake.SharePoint
         {
             //Bind to site collection
             var clientcontext = new ClientContext(sharepointdetails.SharePointURL);
-            var creds = new SharePointOnlineCredentials(sharepointdetails.UserName, sharepointdetails.Password);
+            var creds = new NetworkCredential(sharepointdetails.UserName, sharepointdetails.Password);
             clientcontext.Credentials = creds;
             // Get the folder to upload into. 
             List docs = clientcontext.Web.Lists.GetByTitle(sharepointdetails.LibraryName);

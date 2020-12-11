@@ -4,7 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <UseNETCoreGenerator>true</UseNETCoreGenerator>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.0.5</Version>
+    <Version>1.1.0</Version>
     <Authors>Jeroen Vandezande</Authors>
     <Company />
     <Description>Cake AddIn to upload build artifacts to SharePoint.
@@ -13,74 +13,25 @@ Also allows to get the current filenames on the server and also delete files on 
     <PackageProjectUrl>https://github.com/JeroenVandezande/Cake.SharePoint</PackageProjectUrl>
     <RepositoryUrl>https://github.com/JeroenVandezande/Cake.SharePoint.git</RepositoryUrl>
     <PackageTags>Cake Script Build SharePoint</PackageTags>
-    <PackageReleaseNotes>Fixed deleting of remote files.</PackageReleaseNotes>
+    <PackageReleaseNotes>Now using the Dotnet Standard NuGet Microsoft.SharepointOnline.CSOM package</PackageReleaseNotes>
     <PackageIcon>cake-contrib-medium.png</PackageIcon>
     <PackageIconUrl />
     <RepositoryType>git</RepositoryType>
     <PackageLicenseExpression>MIT</PackageLicenseExpression>
   </PropertyGroup>
 
+  <PropertyGroup>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+  </PropertyGroup>
+
   <ItemGroup>
-    <PackageReference Include="Cake.Core" Version="0.35.0" PrivateAssets="All" />
+    <PackageReference Include="Cake.Core" Version="0.38.5" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SharePointOnline.CSOM" Version="16.1.20720.12000" />
   </ItemGroup>
 
   <ItemGroup>
-    <Reference Include="Microsoft.Office.Client.Policy.Portable">
-      <HintPath>SharePointLibs\Microsoft.Office.Client.Policy.Portable.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Microsoft.Office.Client.TranslationServices.Portable">
-      <HintPath>SharePointLibs\Microsoft.Office.Client.TranslationServices.Portable.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Microsoft.ProjectServer.Client.Portable">
-      <HintPath>SharePointLibs\Microsoft.ProjectServer.Client.Portable.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Microsoft.SharePoint.Client.DocumentManagement.Portable">
-      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.DocumentManagement.Portable.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Microsoft.SharePoint.Client.Portable">
-      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.Portable.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Microsoft.Sharepoint.Client.Publishing.Portable">
-      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.Publishing.Portable.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Microsoft.SharePoint.Client.Runtime.Portable">
-      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.Runtime.Portable.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Microsoft.SharePoint.Client.Runtime.Windows">
-      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.Runtime.Windows.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Microsoft.SharePoint.Client.Search.Applications.Portable">
-      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.Search.Applications.Portable.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Microsoft.SharePoint.Client.Search.Portable">
-      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.Search.Portable.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Microsoft.SharePoint.Client.Taxonomy.Portable">
-      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.Taxonomy.Portable.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Microsoft.SharePoint.Client.UserProfiles.Portable">
-      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.UserProfiles.Portable.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-    <Reference Include="Microsoft.SharePoint.Client.WorkflowServices.Portable">
-      <HintPath>SharePointLibs\Microsoft.SharePoint.Client.WorkflowServices.Portable.dll</HintPath>
-      <Private>true</Private>
-    </Reference>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="\\Mac\Home\Downloads\cake-contrib-medium.png">
+    <None Include="cake-contrib-medium.png">
       <Pack>True</Pack>
       <PackagePath></PackagePath>
     </None>
