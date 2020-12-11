@@ -12,6 +12,7 @@ using Microsoft.SharePoint.Client;
 
 namespace Cake.SharePoint
 {
+    [CakeAliasCategory("SharePoint")]
     public static class CakeSharepoint
     {
         private static readonly int fileChunkSizeInMB = 8;
