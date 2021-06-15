@@ -4,16 +4,18 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <UseNETCoreGenerator>true</UseNETCoreGenerator>
     <GeneratePackageOnBuild>true</GeneratePackageOnBuild>
-    <Version>1.1.0</Version>
+    <Version>2.0.0</Version>
     <Authors>Jeroen Vandezande</Authors>
     <Company />
     <Description>Cake AddIn to upload build artifacts to SharePoint.
-Also allows to get the current filenames on the server and also delete files on the server.</Description>
+Also allows to get the current filenames on the server and delete files on the server.</Description>
     <Copyright>Copyright © Jeroen Vandezande 2020</Copyright>
     <PackageProjectUrl>https://github.com/JeroenVandezande/Cake.SharePoint</PackageProjectUrl>
     <RepositoryUrl>https://github.com/JeroenVandezande/Cake.SharePoint.git</RepositoryUrl>
     <PackageTags>Cake Script Build SharePoint</PackageTags>
-    <PackageReleaseNotes>Now using the Dotnet Standard NuGet Microsoft.SharepointOnline.CSOM package</PackageReleaseNotes>
+    <PackageReleaseNotes>Breaking!!! : Microsoft introduced a new way to authenticate
+Updated to Cake 1.0.0
+Updated to latest SharepointOnline package.</PackageReleaseNotes>
     <PackageIcon>cake-contrib-medium.png</PackageIcon>
     <PackageIconUrl />
     <RepositoryType>git</RepositoryType>
@@ -26,8 +28,10 @@ Also allows to get the current filenames on the server and also delete files on 
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Cake.Core" Version="0.38.5" PrivateAssets="All" />
-    <PackageReference Include="Microsoft.SharePointOnline.CSOM" Version="16.1.20720.12000" />
+    <PackageReference Include="Cake.Core" Version="1.0.0" PrivateAssets="All" />
+    <PackageReference Include="Microsoft.SharePointOnline.CSOM" Version="16.1.21312.12000" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.11.1" />
+    <PackageReference Include="System.Text.Json" Version="5.0.2" />
   </ItemGroup>
 
   <ItemGroup>

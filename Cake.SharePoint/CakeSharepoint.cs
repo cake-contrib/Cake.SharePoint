@@ -15,8 +15,6 @@ namespace Cake.SharePoint
     [CakeAliasCategory("SharePoint")]
     public static class CakeSharepoint
     {
-        private static readonly int fileChunkSizeInMB = 8;
-
         private static Microsoft.SharePoint.Client.Folder GetRemoteFolder(ClientContext ctx, string aRemoteFolder, Microsoft.SharePoint.Client.Folder aRootFolder)
         {
             var folderTree = aRemoteFolder.Split('/');
@@ -38,6 +36,12 @@ namespace Cake.SharePoint
             return result;
         }
 
+        /// <summary>
+        ///  This method will upload a file to SharePoint Online
+        /// </summary>
+        /// <param name="filename">The local filename of the file you want to upload</param>
+        /// <param name="destinationfoldername">The destination on SharePoint folder for the file</param>
+        /// <param name="sharepointdetails">a SharepointSettings object containing all the credentials to login</param>
         [CakeMethodAlias]
         public static void SharePointUploadFile(this ICakeContext cakecontext, string filename, string destinationfoldername, SharePointSettings sharepointdetails)
         {
@@ -46,205 +50,216 @@ namespace Cake.SharePoint
             // Get the size of the file.
             long fileSize = new FileInfo(filename).Length;
             cakecontext?.Log.Write(Verbosity.Normal, LogLevel.Debug, $"Uploading file '{uniqueFileName}' ({(fileSize / 1048576):F} MB) to SharePoint ({destinationfoldername})");
-            //Bind to site collection
-            var clientcontext = new ClientContext(sharepointdetails.SharePointURL);
-            var creds = new NetworkCredential(sharepointdetails.UserName, sharepointdetails.Password);
-            clientcontext.Credentials = creds;
-            //upload file
-            var sw = new Stopwatch();
-            sw.Start();
-            // Each sliced upload requires a unique ID.
-            Guid uploadId = Guid.NewGuid();
-            // Get the folder to upload into. 
-            List docs = clientcontext.Web.Lists.GetByTitle(sharepointdetails.LibraryName);
-            clientcontext.Load(docs, l => l.RootFolder);
-            // Get the information about the folder that will hold the file.
-            clientcontext.Load(docs.RootFolder, f => f.ServerRelativeUrl);
-            clientcontext.Load(docs.RootFolder.Folders);
-            clientcontext.ExecuteQueryAsync().Wait();
 
-            var targetFolder = GetRemoteFolder(clientcontext, destinationfoldername, docs.RootFolder);
-
-            // File object.
-            Microsoft.SharePoint.Client.File uploadFile;
-
-            // Calculate block size in bytes.
-            int blockSize = fileChunkSizeInMB * 1024 * 1024;
-
-            if (fileSize <= blockSize)
+            using (var authenticationManager = new AuthenticationManager())
             {
-                // Use regular approach.
-                using (FileStream fs = new FileStream(filename, FileMode.Open))
+                using (var clientcontext = authenticationManager.GetContext(cakecontext, sharepointdetails))
                 {
-                    FileCreationInformation fileInfo = new FileCreationInformation();
-                    fileInfo.ContentStream = fs;
-                    fileInfo.Url = uniqueFileName;
-                    fileInfo.Overwrite = true;
-                    uploadFile = targetFolder.Files.Add(fileInfo);
-                    clientcontext.Load(uploadFile);
-                    clientcontext.ExecuteQueryAsync().Wait();
-                    sw.Stop();
-                    cakecontext?.Log.Write(Verbosity.Normal, LogLevel.Debug, $"{DateTime.Now.ToShortTimeString()}: Upload of file '{uniqueFileName}' ({(fileSize / 1048576):F} MB) Finished! ({((fileSize / sw.Elapsed.TotalSeconds) / 1048576):F} MBytes/s)");
-                    cakecontext?.Log.Write(Verbosity.Normal, LogLevel.Debug, $"Upload took {sw.Elapsed} to complete");
-                    return;
-                }
-            }
-            else
-            {
-                // Use large file upload approach.
-                ClientResult<long> bytesUploaded = null;
+                    var rootfolder = GetRootFolder(sharepointdetails, clientcontext);
 
-                FileStream fs = null;
-                try
-                {
-                    fs = System.IO.File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
-                    using (BinaryReader br = new BinaryReader(fs))
+                    //upload file
+                    var sw = new Stopwatch();
+                    sw.Start();
+                    // Each sliced upload requires a unique ID.
+                    Guid uploadId = Guid.NewGuid();
+                    // Get the folder to upload into. 
+
+
+
+                    var targetFolder = GetRemoteFolder(clientcontext, destinationfoldername, rootfolder);
+
+                    // File object.
+                    Microsoft.SharePoint.Client.File uploadFile;
+
+                    // Calculate block size in bytes.
+                    int blockSize = sharepointdetails.fileChunkSizeInMB * 1024 * 1024;
+
+                    if (fileSize <= blockSize)
                     {
-                        byte[] buffer = new byte[blockSize];
-                        Byte[] lastBuffer = null;
-                        long fileoffset = 0;
-                        long totalBytesRead = 0;
-                        int bytesRead;
-                        bool first = true;
-                        bool last = false;
-
-                        // Read data from file system in blocks. 
-                        while ((bytesRead = br.Read(buffer, 0, buffer.Length)) > 0)
+                        // Use regular approach.
+                        using (FileStream fs = new FileStream(filename, FileMode.Open))
                         {
-                            totalBytesRead = totalBytesRead + bytesRead;
+                            FileCreationInformation fileInfo = new FileCreationInformation();
+                            fileInfo.ContentStream = fs;
+                            fileInfo.Url = uniqueFileName;
+                            fileInfo.Overwrite = true;
+                            uploadFile = targetFolder.Files.Add(fileInfo);
+                            clientcontext.Load(uploadFile);
+                            clientcontext.ExecuteQueryAsync().Wait();
+                            sw.Stop();
+                            cakecontext?.Log.Write(Verbosity.Normal, LogLevel.Debug, $"{DateTime.Now.ToShortTimeString()}: Upload of file '{uniqueFileName}' ({(fileSize / 1048576):F} MB) Finished! ({((fileSize / sw.Elapsed.TotalSeconds) / 1048576):F} MBytes/s)");
+                            cakecontext?.Log.Write(Verbosity.Normal, LogLevel.Debug, $"Upload took {sw.Elapsed} to complete");
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        // Use large file upload approach.
+                        ClientResult<long> bytesUploaded = null;
 
-                            // You've reached the end of the file.
-                            if (totalBytesRead == fileSize)
+                        FileStream fs = null;
+                        try
+                        {
+                            fs = System.IO.File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                            using (BinaryReader br = new BinaryReader(fs))
                             {
-                                last = true;
-                                // Copy to a new buffer that has the correct size.
-                                lastBuffer = new byte[bytesRead];
-                                Array.Copy(buffer, 0, lastBuffer, 0, bytesRead);
-                            }
-                            cakecontext?.Log.Write(Verbosity.Normal, LogLevel.Debug, $"Upload @ {Math.Round(((double)totalBytesRead / (double)fileSize) * 100)}% : {(totalBytesRead / 1048576):F}/{(fileSize / 1048576):F} MBytes ({((totalBytesRead / sw.Elapsed.TotalSeconds) / 1048576):F} MBytes/s)");
+                                byte[] buffer = new byte[blockSize];
+                                Byte[] lastBuffer = null;
+                                long fileoffset = 0;
+                                long totalBytesRead = 0;
+                                int bytesRead;
+                                bool first = true;
+                                bool last = false;
 
-                            if (first)
-                            {
-                                using (MemoryStream contentStream = new MemoryStream())
+                                // Read data from file system in blocks. 
+                                while ((bytesRead = br.Read(buffer, 0, buffer.Length)) > 0)
                                 {
-                                    // Add an empty file.
-                                    FileCreationInformation fileInfo = new FileCreationInformation();
-                                    fileInfo.ContentStream = contentStream;
-                                    fileInfo.Url = uniqueFileName;
-                                    fileInfo.Overwrite = true;
-                                    uploadFile = targetFolder.Files.Add(fileInfo);
+                                    totalBytesRead = totalBytesRead + bytesRead;
 
-                                    // Start upload by uploading the first slice. 
-                                    using (MemoryStream s = new MemoryStream(buffer))
+                                    // You've reached the end of the file.
+                                    if (totalBytesRead == fileSize)
                                     {
-                                        // Call the start upload method on the first slice.
-                                        bytesUploaded = uploadFile.StartUpload(uploadId, s);
-                                        clientcontext.ExecuteQueryAsync().Wait();
-                                        // fileoffset is the pointer where the next slice will be added.
-                                        fileoffset = bytesUploaded.Value;
+                                        last = true;
+                                        // Copy to a new buffer that has the correct size.
+                                        lastBuffer = new byte[bytesRead];
+                                        Array.Copy(buffer, 0, lastBuffer, 0, bytesRead);
+                                    }
+                                    cakecontext?.Log.Write(Verbosity.Normal, LogLevel.Debug, $"Upload @ {Math.Round(((double)totalBytesRead / (double)fileSize) * 100)}% : {(totalBytesRead / 1048576):F}/{(fileSize / 1048576):F} MBytes ({((totalBytesRead / sw.Elapsed.TotalSeconds) / 1048576):F} MBytes/s)");
+
+                                    if (first)
+                                    {
+                                        using (MemoryStream contentStream = new MemoryStream())
+                                        {
+                                            // Add an empty file.
+                                            FileCreationInformation fileInfo = new FileCreationInformation();
+                                            fileInfo.ContentStream = contentStream;
+                                            fileInfo.Url = uniqueFileName;
+                                            fileInfo.Overwrite = true;
+                                            uploadFile = targetFolder.Files.Add(fileInfo);
+
+                                            // Start upload by uploading the first slice. 
+                                            using (MemoryStream s = new MemoryStream(buffer))
+                                            {
+                                                // Call the start upload method on the first slice.
+                                                bytesUploaded = uploadFile.StartUpload(uploadId, s);
+                                                clientcontext.ExecuteQueryAsync().Wait();
+                                                // fileoffset is the pointer where the next slice will be added.
+                                                fileoffset = bytesUploaded.Value;
+                                            }
+
+                                            // You can only start the upload once.
+                                            first = false;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        // Get a reference to your file.
+                                        uploadFile = clientcontext.Web.GetFileByServerRelativeUrl(targetFolder.ServerRelativeUrl + System.IO.Path.AltDirectorySeparatorChar + uniqueFileName);
+
+                                        if (last)
+                                        {
+                                            // Is this the last slice of data?
+                                            using (MemoryStream s = new MemoryStream(lastBuffer))
+                                            {
+                                                // End sliced upload by calling FinishUpload.
+                                                uploadFile = uploadFile.FinishUpload(uploadId, fileoffset, s);
+                                                clientcontext.ExecuteQueryAsync().Wait();
+                                                return;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            using (MemoryStream s = new MemoryStream(buffer))
+                                            {
+                                                // Continue sliced upload.
+                                                bytesUploaded = uploadFile.ContinueUpload(uploadId, fileoffset, s);
+                                                clientcontext.ExecuteQueryAsync().Wait();
+                                                // Update fileoffset for the next slice.
+                                                fileoffset = bytesUploaded.Value;
+                                            }
+                                        }
                                     }
 
-                                    // You can only start the upload once.
-                                    first = false;
                                 }
                             }
-                            else
+                        }
+                        finally
+                        {
+                            sw.Stop();
+                            cakecontext?.Log.Write(Verbosity.Normal, LogLevel.Debug, $"Upload of file '{uniqueFileName}' ({(fileSize / 1048576):F} MB) Finished! ({((fileSize / sw.Elapsed.TotalSeconds) / 1048576):F} MBytes/s)");
+                            cakecontext?.Log.Write(Verbosity.Normal, LogLevel.Debug, $"Upload took {sw.Elapsed} to complete");
+
+                            if (fs != null)
                             {
-                                // Get a reference to your file.
-                                uploadFile = clientcontext.Web.GetFileByServerRelativeUrl(targetFolder.ServerRelativeUrl + System.IO.Path.AltDirectorySeparatorChar + uniqueFileName);
-
-                                if (last)
-                                {
-                                    // Is this the last slice of data?
-                                    using (MemoryStream s = new MemoryStream(lastBuffer))
-                                    {
-                                        // End sliced upload by calling FinishUpload.
-                                        uploadFile = uploadFile.FinishUpload(uploadId, fileoffset, s);
-                                        clientcontext.ExecuteQueryAsync().Wait();
-                                        return;
-                                    }
-                                }
-                                else
-                                {
-                                    using (MemoryStream s = new MemoryStream(buffer))
-                                    {
-                                        // Continue sliced upload.
-                                        bytesUploaded = uploadFile.ContinueUpload(uploadId, fileoffset, s);
-                                        clientcontext.ExecuteQueryAsync().Wait();
-                                        // Update fileoffset for the next slice.
-                                        fileoffset = bytesUploaded.Value;
-                                    }
-                                }
+                                fs.Dispose();
                             }
-
                         }
                     }
                 }
-                finally
-                {
-                    sw.Stop();
-                    cakecontext?.Log.Write(Verbosity.Normal, LogLevel.Debug, $"Upload of file '{uniqueFileName}' ({(fileSize / 1048576):F} MB) Finished! ({((fileSize / sw.Elapsed.TotalSeconds) / 1048576):F} MBytes/s)");
-                    cakecontext?.Log.Write(Verbosity.Normal, LogLevel.Debug, $"Upload took {sw.Elapsed} to complete");
-
-                    if (fs != null)
-                    {
-                        fs.Dispose();
-                    }
-                }
             }
+        }
+
+        private static Folder GetRootFolder(SharePointSettings sharepointdetails, ClientContext clientcontext)
+        {
+            // The SharePoint web at the URL.
+            var web = clientcontext.Web;
+            List docs = clientcontext.Web.Lists.GetByTitle(sharepointdetails.LibraryName);
+            clientcontext.Load(docs, l => l.RootFolder);
+            // Get the information about the folder that will hold the file. 
+            clientcontext.Load(docs.RootFolder, f => f.ServerRelativeUrl);
+            clientcontext.Load(docs.RootFolder.Folders);
+            clientcontext.ExecuteQueryAsync().Wait();
+            return docs.RootFolder;
         }
 
         [CakeMethodAlias]
         public static IList<String> SharePointGetFilenamesInFolder(this ICakeContext cakecontext, string destinationfoldername, SharePointSettings sharepointdetails)
         {
-            //Bind to site collection
-            var clientcontext = new ClientContext(sharepointdetails.SharePointURL);
-            var creds = new NetworkCredential(sharepointdetails.UserName, sharepointdetails.Password);
-            clientcontext.Credentials = creds;
-            // Get the folder to upload into. 
-            List docs = clientcontext.Web.Lists.GetByTitle(sharepointdetails.LibraryName);
-            clientcontext.Load(docs, l => l.RootFolder);
-            // Get the information about the folder that will hold the file.
-            clientcontext.Load(docs.RootFolder, f => f.ServerRelativeUrl);
-            clientcontext.Load(docs.RootFolder.Folders);
-            clientcontext.ExecuteQueryAsync().Wait();
-
-            var targetFolder = GetRemoteFolder(clientcontext, destinationfoldername, docs.RootFolder);
-            clientcontext.Load(targetFolder.Files);
-            var result = new List<String>();
-            clientcontext.ExecuteQueryAsync().Wait();
-            foreach (var filename in targetFolder.Files)
+            using (var authenticationManager = new AuthenticationManager())
             {
-                result.Add(filename.Name);
+                using (var clientcontext = authenticationManager.GetContext(cakecontext, sharepointdetails))
+                {
+                    var rf = GetRootFolder(sharepointdetails, clientcontext);
+
+                    var targetFolder = GetRemoteFolder(clientcontext, destinationfoldername, rf);
+                    clientcontext.Load(targetFolder.Files);
+                    var result = new List<String>();
+                    clientcontext.ExecuteQueryAsync().Wait();
+                    foreach (var filename in targetFolder.Files)
+                    {
+                        result.Add(filename.Name);
+                    }
+                    return result;
+                }
             }
-            return result;
         }
 
         [CakeMethodAlias]
         public static void SharePointDeleteFilesInFolder(this ICakeContext cakecontext, IList<String> filenames, String destinationfoldername, SharePointSettings sharepointdetails)
         {
-            //Bind to site collection
-            var clientcontext = new ClientContext(sharepointdetails.SharePointURL);
-            var creds = new NetworkCredential(sharepointdetails.UserName, sharepointdetails.Password);
-            clientcontext.Credentials = creds;
-            // Get the folder to upload into. 
-            List docs = clientcontext.Web.Lists.GetByTitle(sharepointdetails.LibraryName);
-            clientcontext.Load(docs, l => l.RootFolder);
-            // Get the information about the folder that will hold the file.
-            clientcontext.Load(docs.RootFolder, f => f.ServerRelativeUrl);
-            clientcontext.Load(docs.RootFolder.Folders);
-            clientcontext.ExecuteQueryAsync().Wait();
+            using (var authenticationManager = new AuthenticationManager())
+            {
+                using (var clientcontext = authenticationManager.GetContext(cakecontext, sharepointdetails))
+                {
+                    var rf = GetRootFolder(sharepointdetails, clientcontext);
+                    // Get the information about the folder that will hold the file.
+                    clientcontext.Load(rf, f => f.ServerRelativeUrl);
+                    clientcontext.Load(rf.Folders);
+                    clientcontext.ExecuteQueryAsync().Wait();
 
-            var targetFolder = GetRemoteFolder(clientcontext, destinationfoldername, docs.RootFolder);
-            clientcontext.Load(targetFolder.Files);
-            clientcontext.ExecuteQueryAsync().Wait();
-            var filesToDelete = targetFolder.Files.Where(f => filenames.Contains(f.Name)).ToList();
-            foreach (var fn in filesToDelete)
-            {         
-                fn.DeleteObject();
+                    var targetFolder = GetRemoteFolder(clientcontext, destinationfoldername, rf);
+                    clientcontext.Load(targetFolder.Files);
+                    clientcontext.ExecuteQueryAsync().Wait();
+                    var filesToDelete = targetFolder.Files.Where(f => filenames.Contains(f.Name)).ToList();
+                    foreach (var fn in filesToDelete)
+                    {
+                        fn.DeleteObject();
+                    }
+                    clientcontext.ExecuteQueryAsync().Wait();
+                }
             }
-            clientcontext.ExecuteQueryAsync().Wait();
         }
     }
+    
 }
 

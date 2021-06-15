@@ -20,3 +20,15 @@ Cake.SharePoint/obj/
 Cake.SharePoint.1.0.4.nupkg
 
 Cake.SharePoint/bin/Debug/Cake.SharePoint.1.0.5.nupkg
+
+Cake.SharePoint/bin/Debug/net461/
+
+SharePointTester/bin/Debug/netcoreapp3.1/
+
+SharePointTester/obj/Debug/netcoreapp3.1/
+
+.cr/personal/FavoritesList/
+
+Cake.SharePoint/bin/Debug/
+
+SharePointTester/obj/
