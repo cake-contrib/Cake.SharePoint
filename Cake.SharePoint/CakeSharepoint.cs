@@ -43,12 +43,12 @@ namespace Cake.SharePoint
         /// <param name="destinationfoldername">The destination on SharePoint folder for the file</param>
         /// <param name="sharepointdetails">a SharepointSettings object containing all the credentials to login</param>
         [CakeMethodAlias]
-        public static void SharePointUploadFile(this ICakeContext cakecontext, string filename, string destinationfoldername, SharePointSettings sharepointdetails)
+        public static void SharePointUploadFile(this ICakeContext cakecontext, Cake.Core.IO.FilePath filename, string destinationfoldername, SharePointSettings sharepointdetails)
         {
             // Get the name of the file.
-            string uniqueFileName = Path.GetFileName(filename);
+            string uniqueFileName = Path.GetFileName(filename.FullPath);
             // Get the size of the file.
-            long fileSize = new FileInfo(filename).Length;
+            long fileSize = new FileInfo(filename.FullPath).Length;
             cakecontext?.Log.Write(Verbosity.Normal, LogLevel.Debug, $"Uploading file '{uniqueFileName}' ({(fileSize / 1048576):F} MB) to SharePoint ({destinationfoldername})");
 
             using (var authenticationManager = new AuthenticationManager())
@@ -77,7 +77,7 @@ namespace Cake.SharePoint
                     if (fileSize <= blockSize)
                     {
                         // Use regular approach.
-                        using (FileStream fs = new FileStream(filename, FileMode.Open))
+                        using (FileStream fs = new FileStream(filename.FullPath, FileMode.Open))
                         {
                             FileCreationInformation fileInfo = new FileCreationInformation();
                             fileInfo.ContentStream = fs;
@@ -100,7 +100,7 @@ namespace Cake.SharePoint
                         FileStream fs = null;
                         try
                         {
-                            fs = System.IO.File.Open(filename, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
+                            fs = System.IO.File.Open(filename.FullPath, FileMode.Open, FileAccess.Read, FileShare.ReadWrite);
                             using (BinaryReader br = new BinaryReader(fs))
                             {
                                 byte[] buffer = new byte[blockSize];
