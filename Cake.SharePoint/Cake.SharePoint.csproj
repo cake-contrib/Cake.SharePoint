@@ -33,7 +33,7 @@ Also allows to get the current filenames on the server and delete files on the s
   <ItemGroup>
     <PackageReference Include="Cake.Core" Version="3.0.0" PrivateAssets="All" />
     <PackageReference Include="Microsoft.SharePointOnline.CSOM" Version="16.1.23109.12000" />
-    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.25.1" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" Version="6.34.0" />
     <PackageReference Include="System.Text.Json" Version="7.0.1" />
   </ItemGroup>
 
